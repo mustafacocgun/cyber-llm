@@ -17,11 +17,23 @@ def mcq_to_record(question, choices, answer_idx, explanation, meta):
                    message("assistant", assistant)], **meta)
 
 
+def _resolve_idx(raw, fmt):
+    """Map a source's answer to a 0-based index. Format is explicit, never guessed."""
+    if fmt == "letter":
+        return ord(str(raw).strip().upper()) - ord("A")
+    if fmt == "index1":
+        return int(raw) - 1
+    if fmt == "index0":
+        return int(raw)
+    raise ValueError(f"unknown answer_format {fmt!r}")
+
+
 def adapt_mcq(row, fm, meta):
+    idx = _resolve_idx(row[fm["answer_idx"]], fm.get("answer_format", "index0"))
     return mcq_to_record(
         row[fm["question"]],
         row[fm["choices"]],
-        int(row[fm["answer_idx"]]),
+        idx,
         row.get(fm.get("explanation", ""), ""),
         meta,
     )

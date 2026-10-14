@@ -13,6 +13,7 @@ import pathlib
 
 from prep import load_config
 from prep.adapters import ADAPTERS
+from prep.dedup import extract_ids
 from prep.mixer import build_splits
 from prep.normalize import to_llama31_messages
 
@@ -26,12 +27,20 @@ def load_source_rows(src, smoke):
     return load_dataset(src["hf_id"], split=src["split"])
 
 
+def _user_text(rec):
+    return " ".join(m["content"] for m in rec["messages"] if m["role"] == "user")
+
+
 def build_pools(config, smoke):
     pools = {}
     for src in config["sources"]:
         meta = {"source": src["name"], "bucket": src["bucket"], "license": src["license"]}
-        pools[src["name"]] = [ADAPTERS[src["adapter"]](row, src["field_map"], meta)
-                              for row in load_source_rows(src, smoke)]
+        recs = []
+        for row in load_source_rows(src, smoke):
+            rec = ADAPTERS[src["adapter"]](row, src["field_map"], meta)
+            rec["meta"]["ids"] = extract_ids(row, src["field_map"], _user_text(rec))
+            recs.append(rec)
+        pools[src["name"]] = recs
     return pools
 
 

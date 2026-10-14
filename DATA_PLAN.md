@@ -41,7 +41,7 @@ heavy because it is the hardest capability to instill.
 ## Four hard rules (the silent failure points)
 
 1. **One tool-call format.** All tool-use data normalizes to Llama-3.1's format; never mix syntaxes.
-2. **De-duplicate** by CVE-id / commit-hash / text-hash; `cyberdata-2` already embeds some PrimeVul/CVEfixes rows.
+2. **De-duplicate** by strong id (commit hash via `id_fields`, CVE via `extract_cve`) or exact text-hash; `cyberdata-2` already embeds some PrimeVul/CVEfixes rows. Paraphrase-level overlap with no shared id is not caught.
 3. **MCQ → reasoning+answer**, and hold the quiz benchmarks OUT as eval — never train on what you test.
 4. **Keep the general slice** (Dolly) so the model doesn't get dumber at everything non-security.
 

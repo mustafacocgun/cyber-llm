@@ -36,7 +36,7 @@ sources:
     bucket: defensive_detect
     license: mixed-drl        # SigmaHQ rows are DRL 1.1 — fine for personal use
     sample: 3000
-    field_map: {conversations: messages, role_key: role, content_key: content}
+    field_map: {conversations: messages, role_key: role, content_key: content, extract_cve: true}
 
   - name: pentest_explanations
     hf_id: theelderemo/pentesting-explanations
@@ -89,7 +89,7 @@ sources:
     bucket: code_vuln
     license: cc-by-4.0
     sample: 1500
-    field_map: {func: func, label: target, cwe: cwe, commit_msg: message}
+    field_map: {func: func, label: target, cwe: cwe, commit_msg: message, id_fields: {commit: commit_id}, extract_cve: true}
 
   - name: primus_reasoning
     hf_id: trend-cybertron/Primus-Reasoning
@@ -98,7 +98,7 @@ sources:
     bucket: reasoning
     license: odc-by
     sample: 1000
-    field_map: {user_fields: [input], reasoning_field: reasoning, assistant_field: answer}
+    field_map: {user_fields: [input], reasoning_field: reasoning, assistant_field: answer, extract_cve: true}
 
   - name: cybermetric
     hf_id: marktrickey/CyberMetric

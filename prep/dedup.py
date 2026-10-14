@@ -6,6 +6,9 @@ duplicates that carry no id. Paraphrase-level overlap is NOT caught — a known
 limitation, documented in DATA_PLAN.md.
 """
 import hashlib
+import re
+
+_CVE_RE = re.compile(r"CVE-\d{4}-\d{4,7}", re.IGNORECASE)
 
 
 def strong_keys(rec):
@@ -32,3 +35,21 @@ def dedup(records):
         seen_text.add(th)
         out.append(rec)
     return out
+
+
+def extract_ids(row, field_map, text=""):
+    """Dedup/decontam ids for a record: declared id columns plus an optional CVE scan.
+
+    `id_fields` maps a key (e.g. 'commit') to a source column; `extract_cve: true`
+    pulls the first CVE id out of the record's text. Returns {} when nothing applies.
+    """
+    ids = {}
+    for key, col in field_map.get("id_fields", {}).items():
+        val = row.get(col)
+        if val not in (None, ""):
+            ids[key] = str(val)
+    if field_map.get("extract_cve"):
+        m = _CVE_RE.search(text or "")
+        if m:
+            ids["cve"] = m.group(0).upper()
+    return ids

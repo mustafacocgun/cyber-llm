@@ -12,7 +12,7 @@
     {"system": "You are a security assistant.", "user": "What is a reverse shell?", "assistant": "A shell where the target connects back to the attacker's listener, often to bypass inbound firewall rules."}
   ],
   "diversevul": [
-    {"func": "char buf[8]; strcpy(buf, input);", "target": 1, "cwe": "CWE-120", "message": "bound the copy with strncpy"},
+    {"func": "char buf[8]; strcpy(buf, input);", "target": 1, "cwe": "CWE-120", "message": "bound the copy with strncpy", "commit_id": "abc123def"},
     {"func": "int add(int a, int b){ return a + b; }", "target": 0, "cwe": "", "message": ""}
   ],
   "cybermetric": [

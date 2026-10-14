@@ -17,6 +17,9 @@ def _require(row, key, adapter):
 
 
 def _join(row, fields):
+    missing = [f for f in fields if f not in row]
+    if missing:          # an absent column is schema drift, not an empty optional value
+        raise KeyError(f"_join: missing columns {missing}, got {sorted(row)}")
     parts = [str(row[f]).strip() for f in fields if row.get(f) not in (None, "")]
     if not parts:
         raise ValueError(f"no content in fields {fields}")
