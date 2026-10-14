@@ -14,12 +14,13 @@ notebook. Keeping prep on CPU saves your ~30 GPU-hrs/week for actual training.
 ## 2. Train (GPU T4 notebook) → GGUF
 
 1. New notebook, accelerator **GPU T4**, **Internet: On**.
-2. **Add Input** → your prep notebook's output. The staging cell copies it from
-   `/kaggle/input/...` into `data/`.
-3. Open `train_unsloth.ipynb`. Run with `SMOKE = True` **first** — it does 50 rows / 10 steps and
-   exercises the whole path (load → train → merge → GGUF) in minutes. If that produces a `.gguf`,
-   set `SMOKE = False` and run the full ~25k training.
-4. Download the `.gguf` from the output (~5 GB, one time, resumable).
+2. Data: optionally **Add Input** → your prep notebook's output. If nothing is attached, the
+   notebook builds the data itself (attach the `HF_TOKEN` secret so the two gated datasets load).
+3. Open `train_unsloth.ipynb`. Run with `SMOKE = True` **first** — 50 rows / 10 steps, a few
+   minutes. Then set `SMOKE = False` and use **Save & Run All**: the full run (~20.8k rows,
+   ~9–10.5 h on a T4) continues in the background, so you can close the browser.
+4. From the run's **Output**: download the `.gguf` (~5 GB, one time, resumable). Keep
+   `lora_adapter/` too — it is the training result, and the GGUF can be re-exported from it.
 
 ## 3. Local (your RTX 4060)
 
