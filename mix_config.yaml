@@ -1,0 +1,160 @@
+# Dataset mix recipe for the cyber-LLM fine-tune.
+# Edit sample counts / add / remove sources HERE — no code changes needed.
+# `field_map` encodes each dataset's DOCUMENTED column names. If a dataset's
+# live schema differs, its adapter raises a clear schema-drift error on the
+# first Kaggle run — fix the column names here, not in the Python.
+#
+# Buckets (for balance tracking): defensive_*, offensive, tool_use, agentic,
+# code_vuln, general_knowledge, reasoning, general_nonsec, eval.
+
+train_target: 25000
+seed: 42
+
+sources:
+  - name: sevenllm
+    hf_id: Multilingual-Multimodal-NLP/SEVENLLM-Dataset
+    split: train
+    adapter: reasoning
+    bucket: defensive_reasoning
+    license: apache-2.0
+    sample: 4000
+    field_map: {user_fields: [instruction, input], reasoning_field: thought, assistant_field: output}
+
+  - name: xlam
+    hf_id: Salesforce/xlam-function-calling-60k
+    split: train
+    adapter: tool_call
+    bucket: tool_use
+    license: cc-by-4.0
+    sample: 3000
+    field_map: {query: query, tools: tools, answers: answers}
+
+  - name: cyberdata2
+    hf_id: VertexAGI-Archives/cyberdata-2-large
+    split: train
+    adapter: messages_passthrough
+    bucket: defensive_detect
+    license: mixed-drl        # SigmaHQ rows are DRL 1.1 — fine for personal use
+    sample: 3000
+    field_map: {conversations: messages, role_key: role, content_key: content}
+
+  - name: pentest_explanations
+    hf_id: theelderemo/pentesting-explanations
+    split: train
+    adapter: messages_passthrough
+    bucket: offensive
+    license: apache-2.0-hacktricks-nc   # built on HackTricks (CC BY-NC) — personal use only
+    sample: 3000
+    field_map: {conversations: messages, role_key: role, content_key: content}
+
+  - name: security_agentic
+    hf_id: ciTy1504/security-agentic-sft-corpus
+    split: train
+    adapter: messages_passthrough
+    bucket: agentic
+    license: mixed            # drop the one CC-BY-NC-SA file at load time
+    sample: 2500
+    field_map:
+      conversations: turns
+      role_key: role
+      content_key: content
+      role_map: {thought: assistant, action: assistant, observation: tool, final: assistant, user: user}
+
+  - name: fenrir
+    hf_id: AlicanKiraz0/Cybersecurity-Dataset-Fenrir-v2.1
+    split: train
+    adapter: instruction
+    bucket: general_knowledge
+    license: apache-2.0
+    sample: 2500
+    field_map: {system_field: system, user_fields: [user], assistant_field: assistant}
+
+  - name: toolace
+    hf_id: Team-ACE/ToolACE
+    split: train
+    adapter: messages_passthrough
+    bucket: tool_use
+    license: apache-2.0
+    sample: 1500
+    field_map:
+      conversations: conversations
+      role_key: from
+      content_key: value
+      role_map: {human: user, gpt: assistant, system: system, tool: tool, observation: tool}
+
+  - name: diversevul
+    hf_id: bstee615/diversevul
+    split: train
+    adapter: vuln_code
+    bucket: code_vuln
+    license: cc-by-4.0
+    sample: 1500
+    field_map: {func: func, label: target, cwe: cwe, commit_msg: message}
+
+  - name: primus_reasoning
+    hf_id: trend-cybertron/Primus-Reasoning
+    split: train
+    adapter: reasoning
+    bucket: reasoning
+    license: odc-by
+    sample: 1000
+    field_map: {user_fields: [input], reasoning_field: reasoning, assistant_field: answer}
+
+  - name: cybermetric
+    hf_id: marktrickey/CyberMetric
+    split: train
+    adapter: mcq
+    bucket: general_knowledge
+    license: apache-2.0
+    sample: 1000
+    field_map: {question: question, choices: choices, answer_idx: answer_idx, explanation: explanation}
+
+  - name: general_nonsec
+    hf_id: databricks/databricks-dolly-15k
+    split: train
+    adapter: instruction
+    bucket: general_nonsec     # anti-forgetting slice — keep the model broadly capable
+    license: cc-by-sa-3.0
+    sample: 1000
+    field_map: {user_fields: [instruction, context], assistant_field: response}
+
+  - name: primus_instruct
+    hf_id: trendmicro-ailab/Primus-Instruct
+    split: train
+    adapter: messages_passthrough
+    bucket: defensive
+    license: odc-by
+    sample: 835
+    field_map: {conversations: messages, role_key: role, content_key: content}
+
+  - name: pentest_checklist
+    hf_id: AYI-NEDJIMI/pentest-checklist-en
+    split: train
+    adapter: instruction
+    bucket: offensive
+    license: cc-by-4.0
+    sample: 160
+    field_map: {user_fields: [question], assistant_field: answer}
+
+  # --- eval-only (held OUT of training; see eval.holdout_sources) ---
+  - name: secqa
+    hf_id: zefang-liu/secqa
+    split: test
+    adapter: mcq
+    bucket: eval
+    license: cc-by-nc-sa-4.0
+    sample: 200
+    field_map: {question: question, choices: choices, answer_idx: answer_idx, explanation: explanation}
+
+  - name: cybermetric_eval
+    hf_id: marktrickey/CyberMetric
+    split: train
+    adapter: mcq
+    bucket: eval
+    license: apache-2.0
+    sample: 80
+    field_map: {question: question, choices: choices, answer_idx: answer_idx, explanation: explanation}
+
+eval:
+  holdout_sources: [secqa, cybermetric_eval]
+  size: 280

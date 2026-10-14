@@ -1,0 +1,9 @@
+# --- Local (data engineering + tests; both already installed) ---
+pyyaml>=6.0
+pytest>=7.4
+
+# --- Kaggle only (do NOT install locally; the notebook installs these) ---
+# datasets>=2.19
+# huggingface_hub>=0.23
+# pandas>=2.0
+# unsloth           # QLoRA training; installs transformers/trl/bitsandbytes/peft
