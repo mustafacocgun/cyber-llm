@@ -14,16 +14,18 @@ notebook. Keeping prep on CPU saves your ~30 GPU-hrs/week for actual training.
 ## 2. Train (GPU T4 notebook) → GGUF
 
 1. New notebook, accelerator **GPU T4**, **Internet: On**.
-2. Attach the Dataset from step 1 (so `data/train.jsonl` is available).
+2. **Add Input** → your prep notebook's output. The staging cell copies it from
+   `/kaggle/input/...` into `data/`.
 3. Open `train_unsloth.ipynb`. Run with `SMOKE = True` **first** — it does 50 rows / 10 steps and
    exercises the whole path (load → train → merge → GGUF) in minutes. If that produces a `.gguf`,
    set `SMOKE = False` and run the full ~25k training.
-4. Download the `.gguf` + `Modelfile` from the output (~5 GB, one time, resumable).
+4. Download the `.gguf` from the output (~5 GB, one time, resumable).
 
 ## 3. Local (your RTX 4060)
 
 ```bash
-ollama create cyber-sec -f Modelfile
+python3 make_modelfile.py ~/Downloads/<file>.gguf   # inside the cyber-llm repo
+ollama create cyber-sec -f ~/Downloads/Modelfile
 ollama run cyber-sec
 ```
 

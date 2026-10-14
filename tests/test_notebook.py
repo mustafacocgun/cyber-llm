@@ -27,3 +27,18 @@ def test_notebook_merges_before_gguf_export():
     s = _src()
     assert "q4_k_m" in s
     assert s.index("save_pretrained_merged") < s.index("save_pretrained_gguf")
+
+
+def test_notebook_stages_attached_kaggle_data():
+    s = _src()
+    assert "/kaggle/input" in s and "shutil.copy" in s
+
+
+def test_notebook_strips_duplicate_bos_and_has_no_stale_format_claim():
+    s = _src()
+    assert "removeprefix(tokenizer.bos_token" in s
+    assert "Llama-3.1)" not in s
+
+
+def test_notebook_points_to_local_modelfile_script():
+    assert "make_modelfile.py" in _src()

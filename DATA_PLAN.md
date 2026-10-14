@@ -9,7 +9,7 @@ via Ollama. Personal/local use (non-commercial datasets allowed; each row keeps 
 ```
 13 raw datasets ──adapt──> one canonical record ──normalize──> system/user/assistant text
    ──dedup/convert──> ~25k mix + held-out eval ──QLoRA (Kaggle T4)──>
-   merge (CPU) ──> GGUF Q4_K_M + Modelfile ──> Ollama on your 4060
+   merge (CPU) ──> GGUF Q4_K_M ──> make_modelfile.py ──> Ollama on your 4060
 ```
 
 Downloads happen on **Kaggle's** network, not yours. The only file you pull locally is the

@@ -10,7 +10,8 @@ via Ollama. See [`DATA_PLAN.md`](DATA_PLAN.md) for the datasets, mix, licenses, 
 mix_config.yaml       the dataset-mix recipe (edit this to rebalance)
 prep/                 offline data engineering (stdlib + pyyaml only)
 prepare_data.py       CLI: build data/train.jsonl + data/eval.jsonl
-train_unsloth.ipynb   Kaggle QLoRA notebook -> GGUF + Modelfile   (Task 5)
+train_unsloth.ipynb   Kaggle QLoRA notebook -> GGUF
+make_modelfile.py     writes the Ollama Modelfile locally (matches the training format)
 tests/                pytest; uses inline fixtures, no downloads
 ```
 
@@ -29,8 +30,9 @@ Only `pytest` + `pyyaml` are needed locally — both already present. The heavy 
 1. **Prep (CPU notebook):** run `prepare_data.py` with internet on; "Save & Run All" to publish
    `data/` as a Kaggle Dataset. (HF token as a Kaggle Secret for gated datasets.)
 2. **Train (GPU T4 notebook):** `train_unsloth.ipynb` reads that Dataset, fine-tunes, and exports
-   a GGUF + Modelfile. Download the ~5 GB GGUF once.
-3. **Local:** `ollama create cyber-sec -f Modelfile && ollama run cyber-sec`.
+   a GGUF. Download the ~5 GB GGUF once.
+3. **Local:** `python3 make_modelfile.py ~/Downloads/<file>.gguf`, then
+   `ollama create cyber-sec -f ~/Downloads/Modelfile && ollama run cyber-sec`.
 
 ## Scope
 
