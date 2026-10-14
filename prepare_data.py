@@ -81,13 +81,21 @@ def adapt_rows(rows, src):
 
 
 def build_pools(config, smoke):
-    pools = {}
+    pools, failed = {}, []
     for src in config["sources"]:
-        rows = list(load_source_rows(src, smoke))
-        recs, skipped = adapt_rows(rows, src)
+        try:
+            rows = list(load_source_rows(src, smoke))
+            recs, skipped = adapt_rows(rows, src)
+        except Exception as e:   # one bad source must not abort the whole run
+            print(f"  !! SKIPPED {src['name']}: {type(e).__name__}: {e}")
+            pools[src["name"]], _ = [], failed.append(src["name"])
+            continue
         if skipped:
             print(f"  {src['name']}: adapted {len(recs)}, skipped {skipped} bad rows")
         pools[src["name"]] = recs
+    if failed:
+        print("\n==== MIX INCOMPLETE — fix field_map for these sources, then re-run ====")
+        print("   " + ", ".join(failed))
     return pools
 
 

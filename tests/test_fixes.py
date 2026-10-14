@@ -66,3 +66,17 @@ def test_adapt_rows_raises_when_all_rows_fail():
     from prepare_data import adapt_rows
     with pytest.raises(RuntimeError):
         adapt_rows([{"nope": 1}, {"nope": 2}], SRC)
+
+
+def test_build_pools_continues_past_a_failing_source(monkeypatch):
+    import prepare_data as pd
+    cfg = {"sources": [
+        {"name": "good", "adapter": "instruction", "bucket": "b", "license": "l",
+         "field_map": {"user_fields": ["instruction"], "assistant_field": "response"}},
+        {"name": "bad", "adapter": "instruction", "bucket": "b", "license": "l",
+         "field_map": {"user_fields": ["instruction"], "assistant_field": "response"}},
+    ], "eval": {"holdout_sources": [], "size": 0}}
+    rows = {"good": [{"instruction": "q", "response": "a"}], "bad": [{"nope": 1}]}
+    monkeypatch.setattr(pd, "load_source_rows", lambda src, smoke: rows[src["name"]])
+    pools = pd.build_pools(cfg, smoke=False)   # must NOT raise
+    assert len(pools["good"]) == 1 and pools["bad"] == []
