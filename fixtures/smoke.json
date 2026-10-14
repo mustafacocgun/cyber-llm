@@ -16,12 +16,12 @@
     {"func": "int add(int a, int b){ return a + b; }", "target": 0, "cwe": "", "message": ""}
   ],
   "cybermetric": [
-    {"question": "Which control best mitigates SQL injection?", "choices": ["disable JavaScript", "parameterized queries", "longer passwords", "HTTPS only"], "answer_idx": 1, "explanation": "Parameterized queries separate code from data, preventing injection."}
+    {"question": "Which control best mitigates SQL injection?", "answers": {"A": "disable JavaScript", "B": "parameterized queries", "C": "longer passwords", "D": "HTTPS only"}, "solution": "B"}
   ],
   "secqa": [
     {"question": "What does the principle of least privilege mean?", "choices": ["admin for all", "only the access needed", "no access", "shared accounts"], "answer_idx": 1, "explanation": "Each identity gets only the access its task requires."}
   ],
   "cybermetric_eval": [
-    {"question": "Which hash is considered broken for security use?", "choices": ["SHA-256", "MD5", "SHA-3", "BLAKE2"], "answer_idx": 1, "explanation": "MD5 is collision-broken and unfit for security."}
+    {"question": "Which hash is considered broken for security use?", "answers": {"A": "SHA-256", "B": "MD5", "C": "SHA-3", "D": "BLAKE2"}, "solution": "B"}
   ]
 }

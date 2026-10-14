@@ -29,10 +29,15 @@ def _resolve_idx(raw, fmt):
 
 
 def adapt_mcq(row, fm, meta):
+    if "choices_dict" in fm:                       # options as {"A": .., "B": ..}
+        d = row[fm["choices_dict"]]
+        choices = [d[k] for k in sorted(d)]
+    else:
+        choices = row[fm["choices"]]
     idx = _resolve_idx(row[fm["answer_idx"]], fm.get("answer_format", "index0"))
     return mcq_to_record(
         row[fm["question"]],
-        row[fm["choices"]],
+        choices,
         idx,
         row.get(fm.get("explanation", ""), ""),
         meta,

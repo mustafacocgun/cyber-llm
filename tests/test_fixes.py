@@ -68,6 +68,20 @@ def test_adapt_rows_raises_when_all_rows_fail():
         adapt_rows([{"nope": 1}, {"nope": 2}], SRC)
 
 
+def test_mcq_adapter_choices_dict_with_letter():
+    row = {"question": "Q", "answers": {"A": "wrong", "B": "right", "C": "x", "D": "y"}, "solution": "B"}
+    fm = {"question": "question", "choices_dict": "answers", "answer_idx": "solution",
+          "answer_format": "letter"}
+    rec = ADAPTERS["mcq"](row, fm, META)
+    assert rec["messages"][-1]["content"].endswith("right")
+
+
+def test_rows_from_json_finds_list_payload():
+    from prepare_data import _rows_from_json
+    assert _rows_from_json({"questions": [1, 2, 3]}) == [1, 2, 3]
+    assert _rows_from_json([{"a": 1}]) == [{"a": 1}]
+
+
 def test_build_pools_continues_past_a_failing_source(monkeypatch):
     import prepare_data as pd
     cfg = {"sources": [

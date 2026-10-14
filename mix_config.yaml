@@ -7,7 +7,7 @@
 # Buckets (for balance tracking): defensive_*, offensive, tool_use, agentic,
 # code_vuln, general_knowledge, reasoning, general_nonsec, eval.
 
-train_target: 25000
+train_target: 22500   # security_agentic (2500) deferred; gated xlam/primus_instruct need HF_TOKEN
 seed: 42
 
 sources:
@@ -47,18 +47,9 @@ sources:
     sample: 3000
     field_map: {conversations: messages, role_key: role, content_key: content}
 
-  - name: security_agentic
-    hf_id: ciTy1504/security-agentic-sft-corpus
-    split: train
-    adapter: messages_passthrough
-    bucket: agentic
-    license: mixed            # drop the one CC-BY-NC-SA file at load time
-    sample: 2500
-    field_map:
-      conversations: turns
-      role_key: role
-      content_key: content
-      role_map: {thought: assistant, action: assistant, observation: tool, final: assistant, user: user}
+  # security_agentic (ciTy1504/security-agentic-sft-corpus) DEFERRED — its turns use a nested
+  # ReAct schema (thought/action/observation), not role/content; needs a bespoke adapter.
+  # Re-add after inspecting one row.
 
   - name: fenrir
     hf_id: AlicanKiraz0/Cybersecurity-Dataset-Fenrir-v2.1
@@ -107,7 +98,8 @@ sources:
     bucket: general_knowledge
     license: apache-2.0
     sample: 1000
-    field_map: {question: question, choices: choices, answer_idx: answer_idx, explanation: explanation}
+    file_contains: "10000"
+    field_map: {question: question, choices_dict: answers, answer_idx: solution, answer_format: letter}
 
   - name: general_nonsec
     hf_id: databricks/databricks-dolly-15k
@@ -137,15 +129,7 @@ sources:
     field_map: {user_fields: [question], assistant_field: answer}
 
   # --- eval-only (held OUT of training; see eval.holdout_sources) ---
-  - name: secqa
-    hf_id: zefang-liu/secqa
-    split: test
-    adapter: mcq
-    bucket: eval
-    license: cc-by-nc-sa-4.0
-    sample: 200
-    field_map: {question: question, choices: choices, answer_idx: answer_idx, explanation: explanation}
-
+  # secqa deferred — separate A/B/C/D columns, different layout; cybermetric_eval covers eval for now.
   - name: cybermetric_eval
     hf_id: marktrickey/CyberMetric
     split: train
@@ -153,8 +137,9 @@ sources:
     bucket: eval
     license: apache-2.0
     sample: 80
-    field_map: {question: question, choices: choices, answer_idx: answer_idx, explanation: explanation}
+    file_contains: "80"
+    field_map: {question: question, choices_dict: answers, answer_idx: solution, answer_format: letter}
 
 eval:
-  holdout_sources: [secqa, cybermetric_eval]
-  size: 280
+  holdout_sources: [cybermetric_eval]
+  size: 80

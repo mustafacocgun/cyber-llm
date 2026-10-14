@@ -28,23 +28,40 @@ def load_source_rows(src, smoke):
         return list(load_dataset(src["hf_id"], split=src["split"]))
     except Exception as e:  # messy JSONL repos break HF's whole-file schema cast
         print(f"  {src['name']}: load_dataset failed ({type(e).__name__}); parsing raw files")
-        return _load_hf_jsonl(src["hf_id"], src["split"])
+        return _load_hf_jsonl(src["hf_id"], src["split"], src.get("file_contains"))
 
 
-def _load_hf_jsonl(hf_id, split):
-    """Fallback: download the repo's data files and parse them tolerantly."""
+def _rows_from_json(data):
+    """Pull the row list out of a whole-file JSON (a list, or a dict wrapping one)."""
+    if isinstance(data, list):
+        return data
+    if isinstance(data, dict):
+        for v in data.values():
+            if isinstance(v, list):
+                return v
+    return []
+
+
+def _load_hf_jsonl(hf_id, split, file_contains=None):
+    """Fallback: download the repo's data files and parse them tolerantly.
+
+    `file_contains` selects one file by substring (e.g. '10000' vs '80' when a repo
+    ships several size variants); otherwise files matching the split name are used.
+    """
     from huggingface_hub import hf_hub_download, list_repo_files
     exts = (".jsonl", ".json", ".parquet")
-    files = list_repo_files(hf_id, repo_type="dataset")
-    cands = [f for f in files if split in f.lower() and f.endswith(exts)] \
-        or [f for f in files if f.endswith(exts)]
+    files = [f for f in list_repo_files(hf_id, repo_type="dataset") if f.endswith(exts)]
+    if file_contains:
+        files = [f for f in files if file_contains in f]
+    else:
+        files = [f for f in files if split in f.lower()] or files
     rows = []
-    for f in cands:
+    for f in files:
         path = hf_hub_download(hf_id, f, repo_type="dataset")
         if f.endswith(".parquet"):
             import pandas as pd
             rows.extend(pd.read_parquet(path).to_dict("records"))
-        else:
+        elif f.endswith(".jsonl"):
             with open(path) as fh:
                 for line in fh:
                     line = line.strip()
@@ -53,6 +70,11 @@ def _load_hf_jsonl(hf_id, split):
                             rows.append(json.loads(line))
                         except json.JSONDecodeError:
                             pass  # skip a corrupt line, keep the rest
+        else:  # whole-file .json (array, or object wrapping an array)
+            try:
+                rows.extend(_rows_from_json(json.load(open(path))))
+            except json.JSONDecodeError:
+                pass
     return rows
 
 
