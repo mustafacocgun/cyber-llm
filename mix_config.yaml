@@ -10,6 +10,15 @@
 train_target: 22500   # security_agentic (2500) deferred; gated xlam/primus_instruct need HF_TOKEN
 seed: 42
 
+# Prepended to EVERY training row and baked into the Ollama Modelfile, so training and
+# inference see the same prompt. (Foundation-Sec's built-in default is ~600 tokens.)
+system_prompt: >-
+  You are a cybersecurity assistant for security engineering, defensive operations,
+  authorized penetration testing, CTF challenges, and learning. Be accurate, explain
+  your reasoning, and say so when you are unsure. When tools are listed, call one by
+  replying with <tool_call>{"name": "...", "arguments": {...}}</tool_call>; tool output
+  comes back inside <tool_response></tool_response>.
+
 sources:
   - name: sevenllm
     hf_id: Multilingual-Multimodal-NLP/SEVENLLM-Dataset

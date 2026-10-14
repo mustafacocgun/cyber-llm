@@ -15,7 +15,7 @@ from prep import load_config
 from prep.adapters import ADAPTERS
 from prep.dedup import extract_ids
 from prep.mixer import build_splits
-from prep.normalize import to_llama31_messages
+from prep.normalize import to_template_messages
 
 FIXTURES = pathlib.Path(__file__).parent / "fixtures" / "smoke.json"
 
@@ -121,10 +121,19 @@ def build_pools(config, smoke):
     return pools
 
 
-def write_jsonl(path, records):
+def write_jsonl(path, records, system_prompt):
+    """Write template-safe rows; return (written, skipped). Skipped = malformed/empty."""
+    written = skipped = 0
     with open(path, "w") as f:
         for rec in records:
-            f.write(json.dumps({"messages": to_llama31_messages(rec), **rec["meta"]}) + "\n")
+            try:
+                msgs = to_template_messages(rec, system_prompt)
+            except ValueError:
+                skipped += 1
+                continue
+            f.write(json.dumps({"messages": msgs, **rec["meta"]}) + "\n")
+            written += 1
+    return written, skipped
 
 
 def main(argv=None):
@@ -142,9 +151,13 @@ def main(argv=None):
 
     out = pathlib.Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    write_jsonl(out / "train.jsonl", train)
-    write_jsonl(out / "eval.jsonl", eval_)
-    print(f"train={len(train)} eval={len(eval_)} -> {out}/")
+    prompt = config["system_prompt"]
+    (out / "system_prompt.txt").write_text(prompt)   # the notebook + Modelfile reuse it
+    n_train, bad_train = write_jsonl(out / "train.jsonl", train, prompt)
+    n_eval, bad_eval = write_jsonl(out / "eval.jsonl", eval_, prompt)
+    if bad_train or bad_eval:
+        print(f"  dropped {bad_train} train / {bad_eval} eval rows (empty turn or bad tool call)")
+    print(f"train={n_train} eval={n_eval} -> {out}/")
 
 
 if __name__ == "__main__":

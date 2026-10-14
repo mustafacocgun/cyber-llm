@@ -7,7 +7,7 @@ via Ollama. Personal/local use (non-commercial datasets allowed; each row keeps 
 ## Pipeline
 
 ```
-13 raw datasets ──adapt──> one canonical record ──normalize──> Llama-3.1 format
+13 raw datasets ──adapt──> one canonical record ──normalize──> system/user/assistant text
    ──dedup/convert──> ~25k mix + held-out eval ──QLoRA (Kaggle T4)──>
    merge (CPU) ──> GGUF Q4_K_M + Modelfile ──> Ollama on your 4060
 ```
@@ -40,7 +40,10 @@ heavy because it is the hardest capability to instill.
 
 ## Four hard rules (the silent failure points)
 
-1. **One tool-call format.** All tool-use data normalizes to Llama-3.1's format; never mix syntaxes.
+1. **One tool-call format.** Foundation-Sec's chat template only knows system/user/assistant and
+   ignores `tool_calls`, so every tool call is written as `<tool_call>{json}</tool_call>` text in the
+   assistant turn and tool output as a `<tool_response>` user turn. Every row gets the same short
+   `system_prompt` from `mix_config.yaml`.
 2. **De-duplicate** by strong id (commit hash via `id_fields`, CVE via `extract_cve`) or exact text-hash; `cyberdata-2` already embeds some PrimeVul/CVEfixes rows. Paraphrase-level overlap with no shared id is not caught.
 3. **MCQ → reasoning+answer**, and hold the quiz benchmarks OUT as eval — never train on what you test.
 4. **Keep the general slice** (Dolly) so the model doesn't get dumber at everything non-security.

@@ -30,7 +30,7 @@ ollama run cyber-sec
 ## Gotchas (already handled in the notebook)
 
 - **Merge before GGUF** (Unsloth #11698) — the notebook merges explicitly first.
-- **Chat-template match** — `prepare_data.py` normalized every row to Llama-3.1, and the notebook
-  applies the base model's own template, so they agree.
+- **Chat-template match** — `prepare_data.py` writes only system/user/assistant turns (tool calls as
+  `<tool_call>` text), which is all Foundation-Sec's own template understands.
 - **Schema drift** — if an adapter raises "expected column X", fix that source's `field_map` in
   `mix_config.yaml` and re-run prep. (Expected on first contact with live data.)
