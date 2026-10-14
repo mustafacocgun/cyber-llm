@@ -49,3 +49,20 @@ def test_pipeline_populates_ids_for_vuln_source():
     cfg = load_config("mix_config.yaml")
     pools = build_pools(cfg, smoke=True)
     assert any(r["meta"]["ids"].get("commit") for r in pools["diversevul"])
+
+
+# Real-data robustness: a few corrupt rows must be skipped, not crash the source
+SRC = {"name": "x", "bucket": "b", "license": "l", "adapter": "instruction",
+       "field_map": {"user_fields": ["instruction"], "assistant_field": "response"}}
+
+
+def test_adapt_rows_skips_bad_rows_keeps_good():
+    from prepare_data import adapt_rows
+    recs, skipped = adapt_rows([{"instruction": "q", "response": "a"}, {"nope": 1}], SRC)
+    assert len(recs) == 1 and skipped == 1
+
+
+def test_adapt_rows_raises_when_all_rows_fail():
+    from prepare_data import adapt_rows
+    with pytest.raises(RuntimeError):
+        adapt_rows([{"nope": 1}, {"nope": 2}], SRC)
