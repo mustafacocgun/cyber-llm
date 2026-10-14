@@ -86,3 +86,8 @@ ADAPTERS = {
     "tool_call": adapt_tool_call,
     "vuln_code": adapt_vuln_code,
 }
+
+# mcq lives in prep.mcq (coupled to the MCQ->reasoning transform); register it here.
+from prep.mcq import adapt_mcq  # noqa: E402
+
+ADAPTERS["mcq"] = adapt_mcq
