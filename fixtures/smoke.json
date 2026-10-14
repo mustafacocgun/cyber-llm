@@ -1,27 +1,92 @@
 {
   "sevenllm": [
-    {"instruction": "Summarize this alert", "input": "4 failed logins then success from one IP", "thought": "brute force then valid auth = likely credential compromise", "output": "Probable successful brute-force; isolate the account and rotate credentials."},
-    {"instruction": "Classify this TTP", "input": "scheduled task created for persistence", "thought": "maps to ATT&CK T1053", "output": "Persistence via Scheduled Task/Job (T1053)."}
+    {
+      "instruction": "Summarize this alert",
+      "input": "4 failed logins then success from one IP",
+      "thought": "brute force then valid auth = likely credential compromise",
+      "output": "Probable successful brute-force; isolate the account and rotate credentials."
+    },
+    {
+      "instruction": "Classify this TTP",
+      "input": "scheduled task created for persistence",
+      "thought": "maps to ATT&CK T1053",
+      "output": "Persistence via Scheduled Task/Job (T1053)."
+    }
   ],
   "xlam": [
-    {"query": "scan ports on 10.0.0.5", "tools": [{"name": "nmap_scan", "description": "port scan a host", "parameters": {"host": "string"}}], "answers": [{"name": "nmap_scan", "arguments": {"host": "10.0.0.5"}}]},
-    {"query": "look up CVE-2023-1234", "tools": [{"name": "cve_lookup", "description": "fetch CVE details", "parameters": {"id": "string"}}], "answers": [{"name": "cve_lookup", "arguments": {"id": "CVE-2023-1234"}}]}
+    {
+      "query": "scan ports on 10.0.0.5",
+      "tools": "[{\"name\": \"nmap_scan\", \"description\": \"port scan a host\", \"parameters\": {\"host\": \"string\"}}]",
+      "answers": "[{\"name\": \"nmap_scan\", \"arguments\": {\"host\": \"10.0.0.5\"}}]"
+    },
+    {
+      "query": "look up CVE-2023-1234",
+      "tools": "[{\"name\": \"cve_lookup\", \"description\": \"fetch CVE details\", \"parameters\": {\"id\": \"string\"}}]",
+      "answers": "[{\"name\": \"cve_lookup\", \"arguments\": {\"id\": \"CVE-2023-1234\"}}]"
+    }
   ],
   "fenrir": [
-    {"system": "You are a security assistant.", "user": "What is CSRF?", "assistant": "Cross-Site Request Forgery tricks a logged-in user's browser into sending unwanted authenticated requests."},
-    {"system": "You are a security assistant.", "user": "What is a reverse shell?", "assistant": "A shell where the target connects back to the attacker's listener, often to bypass inbound firewall rules."}
+    {
+      "system": "You are a security assistant.",
+      "user": "What is CSRF?",
+      "assistant": "Cross-Site Request Forgery tricks a logged-in user's browser into sending unwanted authenticated requests."
+    },
+    {
+      "system": "You are a security assistant.",
+      "user": "What is a reverse shell?",
+      "assistant": "A shell where the target connects back to the attacker's listener, often to bypass inbound firewall rules."
+    }
   ],
   "diversevul": [
-    {"func": "char buf[8]; strcpy(buf, input);", "target": 1, "cwe": "CWE-120", "message": "bound the copy with strncpy", "commit_id": "abc123def"},
-    {"func": "int add(int a, int b){ return a + b; }", "target": 0, "cwe": "", "message": ""}
+    {
+      "func": "char buf[8]; strcpy(buf, input);",
+      "target": 1,
+      "cwe": "CWE-120",
+      "message": "bound the copy with strncpy",
+      "commit_id": "abc123def"
+    },
+    {
+      "func": "int add(int a, int b){ return a + b; }",
+      "target": 0,
+      "cwe": "",
+      "message": ""
+    }
   ],
   "cybermetric": [
-    {"question": "Which control best mitigates SQL injection?", "answers": {"A": "disable JavaScript", "B": "parameterized queries", "C": "longer passwords", "D": "HTTPS only"}, "solution": "B"}
+    {
+      "question": "Which control best mitigates SQL injection?",
+      "answers": {
+        "A": "disable JavaScript",
+        "B": "parameterized queries",
+        "C": "longer passwords",
+        "D": "HTTPS only"
+      },
+      "solution": "B"
+    }
   ],
   "secqa": [
-    {"question": "What does the principle of least privilege mean?", "choices": ["admin for all", "only the access needed", "no access", "shared accounts"], "answer_idx": 1, "explanation": "Each identity gets only the access its task requires."}
+    {
+      "question": "What does the principle of least privilege mean?",
+      "choices": [
+        "admin for all",
+        "only the access needed",
+        "no access",
+        "shared accounts"
+      ],
+      "answer_idx": 1,
+      "explanation": "Each identity gets only the access its task requires."
+    }
   ],
   "cybermetric_eval": [
-    {"question": "Which hash is considered broken for security use?", "answers": {"A": "SHA-256", "B": "MD5", "C": "SHA-3", "D": "BLAKE2"}, "solution": "B"}
+    {
+      "question": "Which hash is considered broken for security use?",
+      "answers": {
+        "A": "SHA-256",
+        "B": "MD5",
+        "C": "SHA-3",
+        "D": "BLAKE2"
+      },
+      "solution": "B"
+    }
   ]
 }
