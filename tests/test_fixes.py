@@ -82,6 +82,16 @@ def test_rows_from_json_finds_list_payload():
     assert _rows_from_json([{"a": 1}]) == [{"a": 1}]
 
 
+def test_tool_call_adapter_parses_json_string_fields():
+    import json
+    row = {"query": "scan host",
+           "tools": json.dumps([{"name": "nmap", "parameters": {}}]),
+           "answers": json.dumps([{"name": "nmap", "arguments": {"host": "10.0.0.5"}}])}
+    fm = {"query": "query", "tools": "tools", "answers": "answers"}
+    rec = ADAPTERS["tool_call"](row, fm, META)
+    assert rec["messages"][-1]["tool_calls"][0]["arguments"] == {"host": "10.0.0.5"}
+
+
 def test_build_pools_continues_past_a_failing_source(monkeypatch):
     import prepare_data as pd
     cfg = {"sources": [

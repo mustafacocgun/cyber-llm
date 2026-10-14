@@ -52,10 +52,15 @@ def adapt_messages_passthrough(row, fm, meta):
     return record(msgs, **meta)
 
 
+def _maybe_json(value):
+    """Some datasets (e.g. xLAM) store list columns as JSON text — parse those."""
+    return json.loads(value) if isinstance(value, str) else value
+
+
 def adapt_tool_call(row, fm, meta):
     query = str(_require(row, fm["query"], "tool_call"))
-    tools = _require(row, fm["tools"], "tool_call")
-    answers = _require(row, fm["answers"], "tool_call")
+    tools = _maybe_json(_require(row, fm["tools"], "tool_call"))
+    answers = _maybe_json(_require(row, fm["answers"], "tool_call"))
     tool_calls = [{"name": a["name"], "arguments": a.get("arguments", {})} for a in answers]
     msgs = [
         message("system", "You can call these tools:\n" + json.dumps(tools)),
