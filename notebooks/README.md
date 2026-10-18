@@ -22,6 +22,14 @@ notebook. Keeping prep on CPU saves your ~30 GPU-hrs/week for actual training.
 4. From the run's **Output**: download the `.gguf` (~5 GB, one time, resumable). Keep
    `lora_adapter/` too — it is the training result, and the GGUF can be re-exported from it.
 
+## If the run stops before the GGUF is saved
+
+Training the full mix on a T4 takes ~11.7 h (~32.5 s/step), close to Kaggle's 12-hour limit, so
+the export can get cut off. The adapter is saved right after training, so nothing is lost:
+open `export_gguf.ipynb` in a new notebook, **Add Input** → the training run's output (with
+`lora_adapter`), GPU T4, Internet On, then **Save & Run All (Commit)** (~30–40 min). It loads
+the adapter, exports Q4_K_M, and puts the `.gguf` in its Output tab.
+
 ## 3. Local (your RTX 4060)
 
 ```bash
