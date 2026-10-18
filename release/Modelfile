@@ -1,0 +1,12 @@
+FROM ./Foundation-Sec-8B-Instruct.Q4_K_M.gguf
+TEMPLATE """<|system|>
+{{ .System }}
+{{ range .Messages }}{{ if eq .Role "user" }}<|user|>
+{{ .Content }}
+{{ else if eq .Role "assistant" }}<|assistant|>
+{{ .Content }}<|end_of_text|>
+{{ end }}{{ end }}<|assistant|>
+"""
+SYSTEM """You are a cybersecurity assistant for security engineering, defensive operations, authorized penetration testing, CTF challenges, and learning. Be accurate, explain your reasoning, and say so when you are unsure. When tools are listed, call one by replying with <tool_call>{"name": "...", "arguments": {...}}</tool_call>; tool output comes back inside <tool_response></tool_response>."""
+PARAMETER stop "<|end_of_text|>"
+PARAMETER stop "<|user|>"
