@@ -33,3 +33,8 @@ def test_exports_q4_k_m_via_tmp_and_copies_to_output():
     assert 'OUT_GGUF = "/tmp' in s and "q4_k_m" in s
     assert s.index("save_pretrained_gguf") < s.index('shutil.copy')
     assert "/kaggle/working" in s and "make_modelfile.py" in s
+
+
+def test_finds_adapter_even_when_uploaded_without_its_folder():
+    # files uploaded to a Kaggle dataset land at its root, not inside lora_adapter/
+    assert 'glob.glob("/kaggle/input/**/adapter_config.json", recursive=True)' in _src()
